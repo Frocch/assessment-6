@@ -2,24 +2,27 @@ const {shuffleArray} = require('./utils')
 
 let testData = [
     {
-        num: 1
+        numid: 1
     },
 
     {
-        num: 12
+        numid: 12
     },
 
     {
-        num: 14
+        numid: 14
     },
 
 ]
 
 
 describe('shuffleArray should', () => {
+
+    // This first test can FAIL if shuffle results for index 0 are the same as testData.
+    // Couldn't figure out how to make a better check for shuffle
     test('items have been shuffled', () => {
         const shuffledArr = shuffleArray(testData);
-        expect(shuffledArr[0].num).not.toBe(testData[0].num)
+        expect(shuffledArr[0].numid).not.toBe(testData[0].numid)
     });
 
     test('return array the same length as original', () => {
