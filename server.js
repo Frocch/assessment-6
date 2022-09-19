@@ -8,22 +8,38 @@ const {shuffleArray} = require('./utils')
 app.use(cors());
 app.use(express.json())
 
+// include and initialize the rollbar library with your access token
+var Rollbar = require('rollbar')
+var rollbar = new Rollbar({
+  accessToken: '0d8e595bb6fd49008f83d4970a9abfb5',
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+})
+
+// record a generic message and send it to Rollbar
+rollbar.log('Hello world!')
+
 app.get("/", function(req, res) {
+    rollbar.info("HTML served succesfully")
     res.sendFile(path.join(__dirname, "/public/index.html"));
 });
 
 app.get("/styles", function(req, res) {
+    rollbar.info("CSS served succesfully")
     res.sendFile(path.join(__dirname, "/public/index.css"));
 });
 
 app.get("/js", function(req, res) {
+    rollbar.info("JS served succesfully")
     res.sendFile(path.join(__dirname, "/public/index.js"));
 });
 
 app.get('/api/robots', (req, res) => {
     try {
+        rollbar.info("Someone got the list of robots")
         res.status(200).send(botsArr)
     } catch (error) {
+        rollbar.error("Failed to get list of robots")
         console.log('ERROR GETTING BOTS', error)
         res.sendStatus(400)
     }
@@ -34,8 +50,10 @@ app.get('/api/robots/five', (req, res) => {
         let shuffled = shuffleArray(bots)
         let choices = shuffled.slice(0, 5)
         let compDuo = shuffled.slice(6, 8)
+        rollbar.info("Bots shuffled, Computer Duo set up.")
         res.status(200).send({choices, compDuo})
     } catch (error) {
+        rollbar.error("Failed to shuffle robots, could not set up Computer Duo or player choices.")
         console.log('ERROR GETTING FIVE BOTS', error)
         res.sendStatus(400)
     }
@@ -80,6 +98,8 @@ app.get('/api/player', (req, res) => {
         res.sendStatus(400)
     }
 })
+
+app.use(rollbar.errorHandler())
 
 const port = process.env.PORT || 3000
 
